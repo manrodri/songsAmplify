@@ -4,7 +4,9 @@ import Amplify, {API, graphqlOperation, Storage} from 'aws-amplify';
 import awsconfig from './aws-exports';
 import {AmplifySignOut, withAuthenticator} from '@aws-amplify/ui-react';
 import {listSongs} from './graphql/queries';
-import {updateSong} from './graphql/mutations';
+import {updateSong, createSong} from './graphql/mutations';
+import { v4 as uuid } from 'uuid';
+
 
 
 import {useState} from 'react';
@@ -153,8 +155,23 @@ const AddSong = ({onUpload}) => {
     const [mp3Data, setMp3Data] = useState('')
 
     // console.log(onUpload)
-    const uploadSong = () => {
+    const uploadSong = async () => {
         console.log('songData -->', songData)
+        const { title, description, owner } = songData
+        const { key } = await Storage.put(`${uuid()}.mp3`, mp3Data, {
+            contentType: 'audio/mp3'
+        })
+
+        const createSongInput = {
+            id: uuid(),
+            title,
+            description,
+            owner,
+            filePath: key,
+            like: 0
+        }
+
+        await API.graphql(graphqlOperation(createSong, {input: createSongInput}))
         onUpload()
     }
 
