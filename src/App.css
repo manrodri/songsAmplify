@@ -29,12 +29,6 @@
 
 }
 
-.songList {
-  display: flex;
-  flex-direction: row;
-
-}
-
 .songTitle {
   font-weight: bold;
 }
